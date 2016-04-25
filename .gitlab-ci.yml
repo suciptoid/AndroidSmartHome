@@ -1,0 +1,24 @@
+image: jangrewe/gitlab-ci-android
+
+stages:
+  - build
+
+debug:
+  stage: build
+  except:
+    - release
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - app/build/outputs/apk/app-debug.apk
+
+release:
+  stage: build
+  only:
+    - release
+  script:
+    - ./gradlew assembleRelease
+  artifacts:
+    paths:
+    - app/build/outputs/apk/app-release.apk

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <!-- Tampilan Utama -->
+    <!-- Tampilan utama berada di dalam drawer layout yang menjadi sliding menu -->
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context="com.pringstudio.materialtemplate.MainActivity">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.AppBarLayout>
+
+        <!--<include layout="@layout/content_main" />-->
+        <FrameLayout
+            android:id="@+id/frame_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!-- Changed with Fragment -->
+        </FrameLayout>
+
+        <!-- Default bawaan IDE, saya sembunyikan -->
+        <android.support.design.widget.FloatingActionButton
+            android:visibility="gone"
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@android:drawable/ic_dialog_email" />
+
+    </android.support.design.widget.CoordinatorLayout>
+    <!-- End tampilan utama -->
+
+    <!-- RecyclerView -->
+    <!-- RecyclerView ini yang menjadi drawer menu,
+    memiliki atribut gravity left, karena defaultnya hidden ke kiri memiliki atribut
+    background karena defaultnya transparent. -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/nav_drawer_recycler"
+        android:scrollbars="vertical"
+        android:layout_width="260dp"
+        android:layout_gravity="left"
+        android:background="#ffffff"
+        android:layout_height="match_parent"/>
+</android.support.v4.widget.DrawerLayout>
