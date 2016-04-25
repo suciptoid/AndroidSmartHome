@@ -1,6 +1,5 @@
-package com.pringstudio.materialtemplate;
+package com.pringstudio.agnosthings;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,16 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout navDrawerLayout;
     ActionBarDrawerToggle navDrawerToogle;
     List<FragmentMenu> navMenuList = new ArrayList<>();
+
+    // Fragment content index
+    int currentFragment = 1;
 
     /**
      * *********************************************************************************************
@@ -56,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         setupNavigationDrawer();
 
         // Set default content for startup activity
-        setFragmentContent(1); // 0 is Home fragment
+        setFragmentContent(currentFragment); // 0 is Home fragment
 
     }
 
@@ -113,11 +111,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Recycerlview
         FragmentMenu recycler = new FragmentMenu(
-                new FragmentRecyclerView(),
-                "Recycler View",
+                new FragmentSaklar(),
+                "Saklar Lampu",
                 R.drawable.ic_cached_grey,
-                "Recycler View Example",
-                "This is just example view"
+                "Semua Saklar Lampu"
         );
 
         navMenuList.add(recycler);
@@ -226,6 +223,9 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = menuItem.getFragment();
         String title = menuItem.getTitle();
         String subtitle = menuItem.getSubtitle();
+
+        // Update index
+        currentFragment = position;
 
 
 

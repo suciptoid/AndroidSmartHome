@@ -1,4 +1,4 @@
-package com.pringstudio.materialtemplate;
+package com.pringstudio.agnosthings;
 
 import org.junit.Test;
 

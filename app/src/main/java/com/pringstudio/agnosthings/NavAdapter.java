@@ -1,4 +1,4 @@
-package com.pringstudio.materialtemplate;
+package com.pringstudio.agnosthings;
 
 import android.content.Context;
 import android.content.res.TypedArray;

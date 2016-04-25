@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="com.pringstudio.materialtemplate.MainActivity">
+        tools:context="com.pringstudio.agnosthings.MainActivity">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -31,13 +31,8 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <!--<include layout="@layout/content_main" />-->
-        <FrameLayout
-            android:id="@+id/frame_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <!-- Changed with Fragment -->
-        </FrameLayout>
+        <include layout="@layout/content_main" />
+
 
         <!-- Default bawaan IDE, saya sembunyikan -->
         <android.support.design.widget.FloatingActionButton
