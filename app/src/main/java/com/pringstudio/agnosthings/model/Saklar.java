@@ -1,14 +1,20 @@
 package com.pringstudio.agnosthings.model;
 
+import io.realm.RealmObject;
+
 /**
  * Created by sucipto on 4/25/16.
  */
-public class Saklar {
-    String id;
-    String name;
-    int value;
+public class Saklar extends RealmObject {
+    private String id;
+    private String name;
+    private int value;
 
-    public Saklar(String name){
+    public Saklar(){
+        // Empty Constructor
+    }
+
+    public Saklar(String name) {
         this.name = name;
     }
 

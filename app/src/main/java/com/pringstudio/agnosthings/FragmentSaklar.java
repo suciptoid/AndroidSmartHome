@@ -15,10 +15,14 @@ import com.pringstudio.agnosthings.view.DividerItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
+
 /**
  * Created by sucipto on 4/14/16.
  */
-public class FragmentSaklar extends Fragment{
+public class FragmentSaklar extends Fragment {
 
     // Main View
     View mainView;
@@ -32,14 +36,30 @@ public class FragmentSaklar extends Fragment{
     // Data Saklar
     List<Saklar> saklarList = new ArrayList<>();
 
+    // Realm
+    Realm realm;
+
+    /**
+     * =============================================================================================
+     */
+
     // Empty Constructor
-    public FragmentSaklar(){
+    public FragmentSaklar() {
         // Nothing
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Init Realm
+        RealmConfiguration config = new RealmConfiguration.Builder(getContext())
+                .name("saklar.realm")
+                .schemaVersion(1)
+                .build();
+
+        realm = Realm.getInstance(config);
+
     }
 
     @Nullable
@@ -53,7 +73,7 @@ public class FragmentSaklar extends Fragment{
         return mainView;
     }
 
-    private void setupSaklarRecycler(){
+    private void setupSaklarRecycler() {
         // Init The View
         recyclerView = (RecyclerView) mainView.findViewById(R.id.saklar_recycler);
 
@@ -76,21 +96,47 @@ public class FragmentSaklar extends Fragment{
      * Get Data Saklar dari API
      */
 
-    private void getDataSaklar(){
+    private void getDataSaklar() {
 
         // Clear Item
         saklarList.clear();
 
-        Saklar saklar = new Saklar("Teras");
-        saklar.setValue(1);
-        saklarList.add(saklar);
+        // Get The Data
+        // ----------------------------------
 
-        Saklar saklar1 = new Saklar("Dapur");
-        saklarList.add(saklar1);
+        RealmResults<Saklar> results = realm.where(Saklar.class).findAll();
 
-        Saklar saklar2 = new Saklar("Taman");
-        saklar2.setValue(1);
-        saklarList.add(saklar2);
+        if (results.size() == 0) {
+
+            realm.beginTransaction();
+
+            Saklar saklar1 = realm.createObject(Saklar.class);
+
+            saklar1.setId("lampu_depan");
+            saklar1.setName("Lampu Depan");
+            saklar1.setValue(1);
+
+            Saklar saklar2 = realm.createObject(Saklar.class);
+
+            saklar2.setId("lampu_teras");
+            saklar2.setName("Lampu Teras");
+            saklar2.setValue(0);
+
+            Saklar saklar3 = realm.createObject(Saklar.class);
+
+            saklar3.setId("lampu_taman");
+            saklar3.setName("Lampu Taman");
+            saklar3.setValue(1);
+
+            realm.commitTransaction();
+
+            results = realm.where(Saklar.class).findAll();
+
+        }
+
+        saklarList.addAll(results);
+
+
 
         // Notify the adapter
         saklarAdapter.notifyDataSetChanged();
