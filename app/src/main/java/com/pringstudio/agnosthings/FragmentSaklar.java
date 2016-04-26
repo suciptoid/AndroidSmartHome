@@ -82,12 +82,14 @@ public class FragmentSaklar extends Fragment{
         saklarList.clear();
 
         Saklar saklar = new Saklar("Teras");
+        saklar.setValue(1);
         saklarList.add(saklar);
 
         Saklar saklar1 = new Saklar("Dapur");
         saklarList.add(saklar1);
 
         Saklar saklar2 = new Saklar("Taman");
+        saklar2.setValue(1);
         saklarList.add(saklar2);
 
         // Notify the adapter

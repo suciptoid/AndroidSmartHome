@@ -28,7 +28,7 @@
         android:text="Lampu XXX"
         android:layout_gravity="center"/>
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/saklar_switch"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
