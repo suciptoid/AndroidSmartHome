@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,6 +48,7 @@ public class FragmentSaklar extends Fragment {
     // Empty Constructor
     public FragmentSaklar() {
         // Nothing
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -54,7 +57,7 @@ public class FragmentSaklar extends Fragment {
 
         // Init Realm
         RealmConfiguration config = new RealmConfiguration.Builder(getContext())
-                .name("saklar.realm")
+                .name("agnosthings.realm")
                 .schemaVersion(1)
                 .build();
 
@@ -71,6 +74,13 @@ public class FragmentSaklar extends Fragment {
         setupSaklarRecycler();
 
         return mainView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_saklar, menu);
+
     }
 
     private void setupSaklarRecycler() {
@@ -112,21 +122,33 @@ public class FragmentSaklar extends Fragment {
 
             Saklar saklar1 = realm.createObject(Saklar.class);
 
-            saklar1.setId("lampu_depan");
-            saklar1.setName("Lampu Depan");
+            saklar1.setId("lampu_kanan");
+            saklar1.setName("Lampu Kanan");
             saklar1.setValue(1);
 
             Saklar saklar2 = realm.createObject(Saklar.class);
 
-            saklar2.setId("lampu_teras");
-            saklar2.setName("Lampu Teras");
+            saklar2.setId("lampu_kiri");
+            saklar2.setName("Lampu Kiri");
             saklar2.setValue(0);
 
             Saklar saklar3 = realm.createObject(Saklar.class);
 
-            saklar3.setId("lampu_taman");
-            saklar3.setName("Lampu Taman");
+            saklar3.setId("lampu_tengah");
+            saklar3.setName("Lampu Tengah");
             saklar3.setValue(1);
+
+            Saklar saklar4 = realm.createObject(Saklar.class);
+
+            saklar4.setId("lampu_halaman");
+            saklar4.setName("Lampu Halaman");
+            saklar4.setValue(1);
+
+            Saklar saklar5 = realm.createObject(Saklar.class);
+
+            saklar5.setId("lampu_jalan");
+            saklar5.setName("Lampu Jalan");
+            saklar5.setValue(1);
 
             realm.commitTransaction();
 

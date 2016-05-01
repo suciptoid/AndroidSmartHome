@@ -62,7 +62,7 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
 
         // Init Realm
         RealmConfiguration config = new RealmConfiguration.Builder(context)
-                .name("saklar.realm")
+                .name("agnosthings.realm")
                 .schemaVersion(1)
                 .build();
 
@@ -93,6 +93,8 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+                AgnosthingsApi api = new AgnosthingsApi(context);
+
                 realm.beginTransaction();
                 if (isChecked) {
                     saklar.setValue(1);
@@ -102,6 +104,9 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
                     holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_grey);
                 }
                 realm.commitTransaction();
+
+                // Push updated data saklar
+                api.pushDataSaklar();
             }
         });
 
