@@ -1,5 +1,6 @@
 package com.pringstudio.agnosthings;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.pringstudio.agnosthings.model.Saklar;
 import com.pringstudio.agnosthings.view.DividerItemDecoration;
+import com.pringstudio.agnosthings.view.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,6 +117,15 @@ public class FragmentSaklar extends Fragment {
 
         // Item Decorator / Divider on list
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity()));
+
+        // Add click listenner
+        saklarAdapter.setOnSaklarItemClickListener(new SaklarAdapter.OnSaklarItemClickListener() {
+            @Override
+            public void onClick(View v, int pos) {
+                Intent saklarHistory = new Intent(getContext(),SaklarHistory.class);
+                startActivity(saklarHistory);
+            }
+        });
 
         // Populate data
         getDataSaklar();

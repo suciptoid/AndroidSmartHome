@@ -32,6 +32,9 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
     // Context
     Context context;
 
+    // Listener
+    OnSaklarItemClickListener saklarItemClickListener;
+
     public class SaklarHolder extends RecyclerView.ViewHolder {
         public TextView saklarName;
         public SwitchCompat saklarSwitch;
@@ -43,7 +46,21 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
             saklarName = (TextView) view.findViewById(R.id.saklar_text);
             saklarSwitch = (SwitchCompat) view.findViewById(R.id.saklar_switch);
             saklarIcon = (ImageView) view.findViewById(R.id.saklar_icon);
+
+            // Click Listener
+            view.setClickable(true);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (saklarItemClickListener != null) {
+                        saklarItemClickListener.onClick(v, position);
+                    }
+                }
+            });
         }
+
+
     }
 
     public SaklarAdapter(List<Saklar> saklarList) {
@@ -76,7 +93,32 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
 
         final Saklar saklar = saklarList.get(position);
 
+        // Saklar Switch Listenner
+        CompoundButton.OnCheckedChangeListener toggleListener = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                AgnosthingsApi api = new AgnosthingsApi(context);
+
+                realm.beginTransaction();
+                if (buttonView.isPressed() && isChecked) {
+                    saklar.setValue(1);
+                    holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_green);
+                } else if (buttonView.isPressed() && !isChecked) {
+                    saklar.setValue(0);
+                    holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_grey);
+                }
+                realm.commitTransaction();
+
+                // Push updated data saklar
+                api.pushDataSaklar();
+            }
+        };
+
         holder.saklarName.setText(saklar.getName());
+
+        // Disable Listener sementara
+        holder.saklarSwitch.setOnCheckedChangeListener(null);
 
         // Set Saklar dari Object / Database
         if (saklar.getValue() == 1) {
@@ -87,34 +129,23 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
             holder.saklarSwitch.setChecked(false);
         }
 
-
-        // Saklar Switch Listenner
-        holder.saklarSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                AgnosthingsApi api = new AgnosthingsApi(context);
-
-                realm.beginTransaction();
-                if (buttonView.isPressed() && isChecked) {
-                    saklar.setValue(1);
-                    holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_green);
-                } else if(buttonView.isPressed() && !isChecked) {
-                    saklar.setValue(0);
-                    holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_grey);
-                }
-                realm.commitTransaction();
-
-                // Push updated data saklar
-                api.pushDataSaklar();
-            }
-        });
+        holder.saklarSwitch.setOnCheckedChangeListener(toggleListener);
 
     }
 
     @Override
     public int getItemCount() {
         return saklarList.size();
+    }
+
+    // Listener interface
+    public interface OnSaklarItemClickListener {
+        public void onClick(View v, int pos);
+    }
+
+    // Listenner setter
+    public void setOnSaklarItemClickListener(OnSaklarItemClickListener listener) {
+        this.saklarItemClickListener = listener;
     }
 
 }
