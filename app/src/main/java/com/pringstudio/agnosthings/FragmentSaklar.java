@@ -5,9 +5,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,6 +42,9 @@ public class FragmentSaklar extends Fragment {
 
     // Realm
     Realm realm;
+
+    // Realm saklar result
+    RealmResults<Saklar> results;
 
     /**
      * =============================================================================================
@@ -83,6 +88,20 @@ public class FragmentSaklar extends Fragment {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id){
+            case R.id.menu_refresh:
+                getDataSaklar();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
     private void setupSaklarRecycler() {
         // Init The View
         recyclerView = (RecyclerView) mainView.findViewById(R.id.saklar_recycler);
@@ -111,10 +130,30 @@ public class FragmentSaklar extends Fragment {
         // Clear Item
         saklarList.clear();
 
-        // Get The Data
-        // ----------------------------------
+        // Api Class
+        AgnosthingsApi agnosthingsApi = new AgnosthingsApi(getContext());
 
-        RealmResults<Saklar> results = realm.where(Saklar.class).findAll();
+        // Update subtittle
+        setSubTitle("Updating data ...");
+
+        // Set Listenner
+        agnosthingsApi.setSaklarValueUpdateListener(new AgnosthingsApi.SaklarValueUpdateListener() {
+            @Override
+            public void onValueLoaded() {
+                results = realm.where(Saklar.class).findAll();
+                saklarList.clear();
+                saklarList.addAll(results);
+                saklarAdapter.notifyDataSetChanged();
+                setSubTitle("");
+            }
+        });
+
+        // Retrieve value from server (Update value from online server)
+        agnosthingsApi.retreiveSaklarValue();
+
+
+        // Get The Data
+        results = realm.where(Saklar.class).findAll();
 
         if (results.size() == 0) {
 
@@ -158,9 +197,29 @@ public class FragmentSaklar extends Fragment {
 
         saklarList.addAll(results);
 
-
-
         // Notify the adapter
         saklarAdapter.notifyDataSetChanged();
     }
+
+    private void setTitle(String title){
+        try {
+            ((MainActivity) getActivity())
+                    .getSupportActionBar()
+                    .setTitle(title);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setSubTitle(String sub){
+        try {
+            ((MainActivity) getActivity())
+                    .getSupportActionBar()
+                    .setSubtitle(sub);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

@@ -96,10 +96,10 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
                 AgnosthingsApi api = new AgnosthingsApi(context);
 
                 realm.beginTransaction();
-                if (isChecked) {
+                if (buttonView.isPressed() && isChecked) {
                     saklar.setValue(1);
                     holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_green);
-                } else {
+                } else if(buttonView.isPressed() && !isChecked) {
                     saklar.setValue(0);
                     holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_grey);
                 }

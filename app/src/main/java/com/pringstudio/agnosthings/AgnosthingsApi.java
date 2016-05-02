@@ -1,6 +1,7 @@
 package com.pringstudio.agnosthings;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,9 +31,20 @@ public class AgnosthingsApi {
     // HTTP CLient
     AsyncHttpClient httpClient = new AsyncHttpClient();
 
+    // Get saklar agnosting api channel
+    String saklar_channel = "http://agnosthings.com/6fb658cc-05fe-11e6-8001-005056805279/";
+
+    // Listenner
+    private SaklarValueUpdateListener saklarValueUpdateListener;
+
+    // Saklar value proccessed data
+    int processedData = 0;
+
     public AgnosthingsApi(Context context) {
 
         this.context = context;
+
+        saklarValueUpdateListener = null;
 
         // Init Realm
         RealmConfiguration config = new RealmConfiguration.Builder(context)
@@ -43,12 +55,14 @@ public class AgnosthingsApi {
         realm = Realm.getInstance(config);
     }
 
+    // Send data to agnosthing api server
     public void pushDataSaklar() {
+
+        Log.d("pushDataSaklar()","Fire..!!");
 
         // Get All Saklar
         RealmResults<Saklar> saklars = realm.where(Saklar.class).findAll();
-        // Get saklar agnosting api channel
-        String saklar_channel = "http://agnosthings.com/6fb658cc-05fe-11e6-8001-005056805279/feed?push=";
+
 
         // Get saklar item
         List<String> saklar_item = new ArrayList<>();
@@ -58,8 +72,8 @@ public class AgnosthingsApi {
 
         String saklarku = TextUtils.join(",", saklar_item);
 
-        String api_url = saklar_channel + saklarku;
-        Log.d("AgnosthingApi", "Saklarku : " + saklar_channel + saklarku);
+        String api_url = saklar_channel +"feed?push="+ saklarku;
+        Log.d("AgnosthingApi", "Saklarku : " + api_url);
 
         // Cancel all pending request
         httpClient.cancelAllRequests(true);
@@ -104,6 +118,66 @@ public class AgnosthingsApi {
         });
 
     }
+
+    // Retreive Data from api server
+    public void retreiveSaklarValue(){
+        // Get All Saklar
+        final RealmResults<Saklar> saklars = realm.where(Saklar.class).findAll();
+
+
+
+        for (final Saklar saklar : saklars){
+            final String saklar_url = saklar_channel+"field/last/feed/174/"+saklar.getId();
+            Log.d("Saklar URL",saklar_url);
+
+            httpClient.get(context,saklar_url, new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    //super.onSuccess(statusCode, headers, response);
+                    try {
+                        int oldValue = saklar.getValue();
+                        int newValue = response.getInt("value");
+                        realm.beginTransaction();
+                        saklar.setValue(newValue);
+                        realm.commitTransaction();
+
+                        processedData++;
+
+                        if(saklars.size() == processedData){
+                            if(saklarValueUpdateListener != null){
+                                // Send Signal to listenner
+                                saklarValueUpdateListener.onValueLoaded();
+                            }
+                        }
+
+                        Log.d("Update Skalar Value","UPdating saklar value "+saklar.getId()+" From: "+oldValue+" to "+newValue);
+                    }catch (Exception e){
+                        Toast.makeText(context,"Get data "+saklar.getId()+" fail!",Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    //super.onFailure(statusCode, headers, responseString, throwable);
+                    throwable.printStackTrace();
+                }
+            });
+
+
+        }
+    }
+
+    // Listener for Saklar update value
+    public interface SaklarValueUpdateListener{
+        public void onValueLoaded();
+    }
+
+    public void setSaklarValueUpdateListener(SaklarValueUpdateListener listener){
+        this.saklarValueUpdateListener = listener;
+    }
+
 
 
 }
