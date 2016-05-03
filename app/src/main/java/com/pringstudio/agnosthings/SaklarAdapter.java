@@ -3,13 +3,11 @@ package com.pringstudio.agnosthings;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.pringstudio.agnosthings.model.Saklar;
@@ -101,10 +99,10 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
                 AgnosthingsApi api = new AgnosthingsApi(context);
 
                 realm.beginTransaction();
-                if (buttonView.isPressed() && isChecked) {
+                if (isChecked) {
                     saklar.setValue(1);
                     holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_green);
-                } else if (buttonView.isPressed() && !isChecked) {
+                } else {
                     saklar.setValue(0);
                     holder.saklarIcon.setImageResource(R.drawable.ic_lightbulb_outline_grey);
                 }

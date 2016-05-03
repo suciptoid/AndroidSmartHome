@@ -10,10 +10,13 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.pringstudio.agnosthings.model.Saklar;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cz.msebera.android.httpclient.Header;
 import io.realm.Realm;
@@ -36,6 +39,7 @@ public class AgnosthingsApi {
 
     // Listenner
     private SaklarValueUpdateListener saklarValueUpdateListener;
+    private SaklarHistoryLoadedListener saklarHistoryLoadedListener;
 
     // Saklar value proccessed data
     int processedData = 0;
@@ -130,6 +134,7 @@ public class AgnosthingsApi {
             final String saklar_url = saklar_channel+"field/last/feed/174/"+saklar.getId();
             Log.d("Saklar URL",saklar_url);
 
+            httpClient.setTimeout(30);
             httpClient.get(context,saklar_url, new JsonHttpResponseHandler(){
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -161,6 +166,19 @@ public class AgnosthingsApi {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                     //super.onFailure(statusCode, headers, responseString, throwable);
+                    if(saklarValueUpdateListener != null){
+                        // Send Signal to listenner
+                        saklarValueUpdateListener.onFail();
+                    }
+                    throwable.printStackTrace();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    if(saklarValueUpdateListener != null){
+                        // Send Signal to listenner
+                        saklarValueUpdateListener.onFail();
+                    }
                     throwable.printStackTrace();
                 }
             });
@@ -169,9 +187,62 @@ public class AgnosthingsApi {
         }
     }
 
+    // Retreive Saklar History
+    public void getSaklarHistory(String id){
+
+        final List<Map<String,String>> historyList = new ArrayList<>();
+
+
+        httpClient.setTimeout(30);
+        httpClient.cancelRequests(context,true);
+        httpClient.cancelAllRequests(true);
+
+        String api_url = saklar_channel+"field/week/feed/174/"+id;
+
+        httpClient.get(context,api_url, new JsonHttpResponseHandler(){
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                if(statusCode == 200){
+                    try {
+                        JSONArray dataList = response.getJSONArray("cValue");
+                        for(int x = 0; x < dataList.length(); x++){
+                            String data = dataList.get(x).toString();
+                            String value = data.split(",")[0];
+                            String date = data.split(",")[1];
+
+                            Map<String,String> history = new HashMap<>();
+                            history.put("value",value);
+                            history.put("date",date);
+                            historyList.add(history);
+                            Log.d("API",history.toString());
+                        }
+
+                        if(saklarHistoryLoadedListener != null){
+                            saklarHistoryLoadedListener.onDataLoaded(historyList);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        });
+
+    }
+
     // Listener for Saklar update value
     public interface SaklarValueUpdateListener{
         public void onValueLoaded();
+        public void onFail();
+    }
+
+    public interface SaklarHistoryLoadedListener{
+        public void onDataLoaded(List<Map<String,String>> data);
+    }
+
+    public void setSaklarHistoryLoadedListener(SaklarHistoryLoadedListener listener){
+        this.saklarHistoryLoadedListener = listener;
     }
 
     public void setSaklarValueUpdateListener(SaklarValueUpdateListener listener){

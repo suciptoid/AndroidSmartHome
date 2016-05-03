@@ -123,6 +123,8 @@ public class FragmentSaklar extends Fragment {
             @Override
             public void onClick(View v, int pos) {
                 Intent saklarHistory = new Intent(getContext(),SaklarHistory.class);
+                Saklar item = saklarList.get(pos);
+                saklarHistory.putExtra("saklarID",item.getId());
                 startActivity(saklarHistory);
             }
         });
@@ -156,6 +158,11 @@ public class FragmentSaklar extends Fragment {
                 saklarList.addAll(results);
                 saklarAdapter.notifyDataSetChanged();
                 setSubTitle("");
+            }
+
+            @Override
+            public void onFail(){
+                setSubTitle("Update data failed");
             }
         });
 
