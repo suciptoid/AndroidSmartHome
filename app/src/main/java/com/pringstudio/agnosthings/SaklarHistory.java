@@ -91,6 +91,8 @@ public class SaklarHistory extends AppCompatActivity {
 
     private void getHistoryData(){
         textHistory.setText("Loading...");
+        textHistory.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
 
         AgnosthingsApi api = new AgnosthingsApi(this);
 

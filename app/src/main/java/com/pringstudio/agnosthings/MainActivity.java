@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         // Create Home Menu
         FragmentMenu home = new FragmentMenu(
                 new FragmentHome(),
-                "Home",
+                "Dashboard",
                 R.drawable.ic_dashboard_grey
         );
         navMenuList.add(home);
