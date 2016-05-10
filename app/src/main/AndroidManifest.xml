@@ -30,6 +30,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.pringstudio.agnosthings.MainActivity" />
         </activity>
+        <activity android:name=".PringIntro"
+            android:label="@string/app_intro"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

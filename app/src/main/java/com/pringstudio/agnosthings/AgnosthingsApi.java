@@ -14,6 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,8 @@ public class AgnosthingsApi {
     // Listenner
     private SaklarValueUpdateListener saklarValueUpdateListener;
     private SaklarHistoryLoadedListener saklarHistoryLoadedListener;
+    private SuhuLoadedListener suhuLoadedListener;
+    private PDAMLoadedListener pdamLoadedListener;
 
     // Saklar value proccessed data
     int processedData = 0;
@@ -231,14 +235,132 @@ public class AgnosthingsApi {
 
     }
 
+    // Mengambil data suhu dari server dan menampilkan sebagai chart.
+    public void getDataSuhu(){
+
+        final List<Map<String,String>> dataSuhu = new ArrayList<>();
+
+        httpClient.setTimeout(30);
+        String api_url = "http://agnosthings.com/c68a9cbe-15d3-11e6-8001-005056805279/channel/last/feed/275/12";
+
+        httpClient.get(context,api_url,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                if(statusCode == 200){
+                    try {
+                        JSONArray dataList = response.getJSONArray("cValue");
+                        for(int x = 0; x < dataList.length(); x++){
+                            String data = dataList.get(x).toString();
+                            String value = data.split(",")[1];
+                            String date = data.split(",")[2];
+
+                            Map<String,String> history = new HashMap<>();
+                            history.put("value",value);
+                            history.put("date",date);
+                            dataSuhu.add(history);
+                            Log.d("getDataSuhu()",history.toString());
+                        }
+
+                        if(suhuLoadedListener != null){
+                            Collections.reverse(dataSuhu);
+                            suhuLoadedListener.onDataLoaded(dataSuhu);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if(suhuLoadedListener != null){
+                    suhuLoadedListener.onFail();
+                }
+                throwable.printStackTrace();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if(suhuLoadedListener != null){
+                    suhuLoadedListener.onFail();
+                }
+                throwable.printStackTrace();
+            }
+        });
+    }
+
+    public void getDataPDAM(){
+        final List<Map<String,String>> dataPDAM = new ArrayList<>();
+
+        httpClient.setTimeout(30);
+        String api_url = "http://agnosthings.com/96b322c6-15d4-11e6-8001-005056805279/channel/last/feed/278/100";
+
+        httpClient.get(context,api_url,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                if(statusCode == 200){
+                    try {
+                        JSONArray dataList = response.getJSONArray("cValue");
+                        for(int x = 0; x < dataList.length(); x++){
+                            String data = dataList.get(x).toString();
+                            String value = data.split(",")[1];
+                            String date = data.split(",")[2];
+
+                            Map<String,String> history = new HashMap<>();
+                            history.put("value",value);
+                            history.put("date",date);
+                            dataPDAM.add(history);
+                            Log.d("getdataPDAM()",history.toString());
+                        }
+
+                        if(pdamLoadedListener != null){
+                            Collections.reverse(dataPDAM);
+                            pdamLoadedListener.onDataLoaded(dataPDAM);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                if(pdamLoadedListener != null){
+                    pdamLoadedListener.onFail();
+                }
+                throwable.printStackTrace();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                if(pdamLoadedListener != null){
+                    pdamLoadedListener.onFail();
+                }
+                throwable.printStackTrace();
+            }
+        });
+    }
+
     // Listener for Saklar update value
     public interface SaklarValueUpdateListener{
-        public void onValueLoaded();
-        public void onFail();
+        void onValueLoaded();
+        void onFail();
     }
 
     public interface SaklarHistoryLoadedListener{
-        public void onDataLoaded(List<Map<String,String>> data);
+        void onDataLoaded(List<Map<String,String>> data);
+    }
+
+    // Listener Suhu ruangan
+    public interface SuhuLoadedListener{
+        void onDataLoaded(List<Map<String,String>> data);
+        void onFail();
+    }
+
+    // Listener PDAM
+    public interface PDAMLoadedListener{
+        void onDataLoaded(List<Map<String,String>> data);
+        void onFail();
     }
 
     public void setSaklarHistoryLoadedListener(SaklarHistoryLoadedListener listener){
@@ -248,6 +370,18 @@ public class AgnosthingsApi {
     public void setSaklarValueUpdateListener(SaklarValueUpdateListener listener){
         this.saklarValueUpdateListener = listener;
     }
+
+    // Listener setter
+    public void setSuhuLoadedListener(SuhuLoadedListener listener){
+        this.suhuLoadedListener = listener;
+    }
+
+    // Listener pdam setter
+    public void setPDAMLoadedListener(PDAMLoadedListener listener){
+        this.pdamLoadedListener = listener;
+    }
+
+
 
 
 

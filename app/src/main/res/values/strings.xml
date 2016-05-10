@@ -96,4 +96,6 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="refresh">Refresh</string>
+    <string name="app_intor">Intro</string>
+    <string name="app_intro">Intro</string>
 </resources>

@@ -94,4 +94,5 @@ fabric.properties
 
 ### Intellij Patch ###
 *.iml
-
+# Screenshot
+device*.png
