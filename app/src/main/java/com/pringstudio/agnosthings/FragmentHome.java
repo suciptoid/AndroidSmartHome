@@ -1,5 +1,7 @@
 package com.pringstudio.agnosthings;
 
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,8 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -25,6 +31,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.pringstudio.agnosthings.view.ProgressBarAnimation;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,6 +48,7 @@ public class FragmentHome extends Fragment {
 
     View mainView;
     LineChart chartSuhu, chartPDAM;
+    Menu mainMenu;
 
     AgnosthingsApi api;
 
@@ -56,6 +65,7 @@ public class FragmentHome extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater,container,savedInstanceState);
         mainView = inflater.inflate(R.layout.fragment_home, container, false);
 
         // Setup api
@@ -74,7 +84,7 @@ public class FragmentHome extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_home, menu);
-
+        mainMenu = menu;
     }
 
     @Override
@@ -84,6 +94,7 @@ public class FragmentHome extends Fragment {
         switch (id){
             case R.id.menu_home_refresh:
                 updateChart();
+                //startAnimateRefreshMenu(true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -116,66 +127,6 @@ public class FragmentHome extends Fragment {
     }
 
     private void updateChart(){
-
-        // Log.d
-        Log.d("updateChart()","Update chart Home fragment");
-
-        // Dummy data chart suhu
-        /*final ArrayList<Entry> entrySuhu = new ArrayList<>();
-        entrySuhu.add(new Entry(39,0));
-        entrySuhu.add(new Entry(30,1));
-        entrySuhu.add(new Entry(35,2));
-        entrySuhu.add(new Entry(36,3));
-        entrySuhu.add(new Entry(25,4));
-        entrySuhu.add(new Entry(24,5));
-        entrySuhu.add(new Entry(35,6));
-        entrySuhu.add(new Entry(25,7));
-        entrySuhu.add(new Entry(26,8));
-        entrySuhu.add(new Entry(35,9));
-
-        final ArrayList<String> labelSuhu = new ArrayList<>();
-        labelSuhu.add("06:00");
-        labelSuhu.add("07:00");
-        labelSuhu.add("08:00");
-        labelSuhu.add("09:00");
-        labelSuhu.add("10:00");
-        labelSuhu.add("11:00");
-        labelSuhu.add("12:00");
-        labelSuhu.add("13:00");
-        labelSuhu.add("14:00");
-        labelSuhu.add("15:00");
-
-        LineDataSet dataSetSuhu = new LineDataSet(entrySuhu, "Derajat celcius");
-        dataSetSuhu.setColor(Color.parseColor("#009688"));
-        dataSetSuhu.setCircleColor(Color.parseColor("#ffcdd2"));
-        dataSetSuhu.setCircleColorHole(Color.parseColor("#f44336"));
-
-        LineData dataSuhu = new LineData(labelSuhu, dataSetSuhu);
-
-        chartSuhu.setData(dataSuhu);*/
-
-
-        // Dummy data chart PDAM
-        /*ArrayList<Entry> entryPDAM = new ArrayList<>();
-        entryPDAM.add(new Entry(320,0));
-        entryPDAM.add(new Entry(350,1));
-        entryPDAM.add(new Entry(410,2));
-        entryPDAM.add(new Entry(440,3));
-        entryPDAM.add(new Entry(470,4));
-        entryPDAM.add(new Entry(520,5));
-        entryPDAM.add(new Entry(550,6));
-
-
-        final ArrayList<String> labelPDAM = new ArrayList<>();
-        labelPDAM.add("Senin");
-        labelPDAM.add("Selasa");
-        labelPDAM.add("Rabu");
-        labelPDAM.add("Kamis");
-        labelPDAM.add("Jumat");
-        labelPDAM.add("Sabut");
-        labelPDAM.add("Minggu");*/
-
-
 
 
         api.getDataSuhu();
@@ -226,7 +177,7 @@ public class FragmentHome extends Fragment {
                 chartSuhu.notifyDataSetChanged();
 
                 // Animate
-                chartSuhu.animateY(2000);
+                chartSuhu.animateY(1000);
             }
 
             @Override
@@ -281,7 +232,7 @@ public class FragmentHome extends Fragment {
                 LineData dataPDAM = new LineData(labelPDAM, dataSetPDAM);
 
                 chartPDAM.setData(dataPDAM);
-                chartPDAM.animateY(2000);
+                chartPDAM.animateY(1000);
                 chartPDAM.notifyDataSetChanged();
             }
 
@@ -295,13 +246,112 @@ public class FragmentHome extends Fragment {
             }
         });
 
+        final ProgressBar progressBarListrik = (ProgressBar) mainView.findViewById(R.id.progressListrik);
+        final ProgressBar progressBarLPG = (ProgressBar) mainView.findViewById(R.id.progressLpg);
+        final TextView listrikUpdated = (TextView) mainView.findViewById(R.id.update_listrik_text);
+        final TextView listrikProgress = (TextView) mainView.findViewById(R.id.progress_listrik_text);
+        final int maxValue = 200;
+
+
+        // Reset Progressbar
+        //progressBar.setProgress(0);
+        ProgressBarAnimation animation = new ProgressBarAnimation(progressBarListrik,progressBarListrik.getProgress(),0);
+        animation.setDuration(500);
+        progressBarListrik.setAnimation(animation);
+
+        startCountAnimation(listrikProgress,500,(progressBarListrik.getProgress()*100)/maxValue,0);
+
+        listrikUpdated.setText("Loading...");
+        listrikProgress.setText("0%");
+
+        api.getDataListrik();
+        api.setListrikLoadedListener(new AgnosthingsApi.ListrikLoadedListener() {
+            @Override
+            public void onDataLoaded(String data) {
+                String kwh = data.split(",")[1];
+                String lastDate = data.split(",")[2];
+
+                // Date formater
+                SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+                Date parsed = new Date();
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm");
+                dateFormat.setTimeZone(TimeZone.getDefault());
+
+                // end date formater
+
+                try {
+                    parsed = sourceFormat.parse(lastDate);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                String newDate = dateFormat.format(parsed);
+
+                String prosentase = String.valueOf((Integer.valueOf(kwh)*100)/maxValue);
+
+
+                listrikUpdated.setText("Update : \n"+newDate);
+                listrikProgress.setText(prosentase+"%");
+                startCountAnimation(listrikProgress,1000,0,Integer.valueOf(prosentase));
+
+                // Test progressbar
+
+                progressBarListrik.setMax(maxValue);
+                progressBarListrik.setProgress(Integer.valueOf(kwh));
+                ProgressBarAnimation animation = new ProgressBarAnimation(progressBarListrik,0,Integer.valueOf(kwh));
+                animation.setDuration(1000);
+                progressBarListrik.setAnimation(animation);
+
+
+                //startAnimateRefreshMenu(false);
+                Log.d("Listrik","Loaded , Data : "+kwh+", date: "+newDate);
+            }
+
+            @Override
+            public void onFail() {
+                try{
+                    Snackbar.make(getView(),"Refresh data gagal, coba lagi nanti", Snackbar.LENGTH_LONG).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
 
 
         // Test progressbar
-        ProgressBar progressBar = (ProgressBar) mainView.findViewById(R.id.progressBar);
-        ProgressBarAnimation animation = new ProgressBarAnimation(progressBar,0,progressBar.getProgress());
-        animation.setDuration(1500);
-        progressBar.setAnimation(animation);
+        //TODO: Progressbar GAS LPG
+        ProgressBarAnimation animation2 = new ProgressBarAnimation(progressBarLPG,0,progressBarLPG.getProgress());
+        animation2.setDuration(1500);
+        progressBarLPG.setAnimation(animation2);
+    }
+
+    private void startCountAnimation(TextView textProgress, int duration, int from, int to) {
+        ValueAnimator animator = new ValueAnimator();
+        animator.setObjectValues(from, to);
+        animator.setDuration(duration);
+        final TextView textView = textProgress;
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            public void onAnimationUpdate(ValueAnimator animation) {
+                textView.setText("" + (int) animation.getAnimatedValue()+"%");
+            }
+        });
+        animator.start();
+    }
+
+    private void startAnimateRefreshMenu(boolean start){
+        //TODO: Gak bisa berenti muter, gak di pake dulu lah
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        ImageView iv = (ImageView)inflater.inflate(R.layout.iv_refresh, null);
+        Animation rotation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_refresh);
+        rotation.setRepeatCount(Animation.INFINITE);
+        iv.startAnimation(rotation);
+        //item.setActionView(iv);
+        if(start){
+            mainMenu.findItem(R.id.menu_home_refresh).setActionView(iv);
+        }else {
+            mainMenu.findItem(R.id.menu_home_refresh).setIcon(R.drawable.ic_cached_grey_200_36dp);
+        }
     }
 
 

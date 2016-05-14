@@ -44,6 +44,7 @@ public class AgnosthingsApi {
     private SaklarHistoryLoadedListener saklarHistoryLoadedListener;
     private SuhuLoadedListener suhuLoadedListener;
     private PDAMLoadedListener pdamLoadedListener;
+    private ListrikLoadedListener listrikLoadedListener;
 
     // Saklar value proccessed data
     int processedData = 0;
@@ -66,7 +67,7 @@ public class AgnosthingsApi {
     // Send data to agnosthing api server
     public void pushDataSaklar() {
 
-        Log.d("pushDataSaklar()","Fire..!!");
+        //Log.d("pushDataSaklar()","Fire..!!");
 
         // Get All Saklar
         RealmResults<Saklar> saklars = realm.where(Saklar.class).findAll();
@@ -81,7 +82,7 @@ public class AgnosthingsApi {
         String saklarku = TextUtils.join(",", saklar_item);
 
         String api_url = saklar_channel +"feed?push="+ saklarku;
-        Log.d("AgnosthingApi", "Saklarku : " + api_url);
+        //Log.d("AgnosthingApi", "Saklarku : " + api_url);
 
         // Cancel all pending request
         httpClient.cancelAllRequests(true);
@@ -136,7 +137,7 @@ public class AgnosthingsApi {
 
         for (final Saklar saklar : saklars){
             final String saklar_url = saklar_channel+"field/last/feed/174/"+saklar.getId();
-            Log.d("Saklar URL",saklar_url);
+            //Log.d("Saklar URL",saklar_url);
 
             httpClient.setTimeout(30);
             httpClient.get(context,saklar_url, new JsonHttpResponseHandler(){
@@ -159,7 +160,7 @@ public class AgnosthingsApi {
                             }
                         }
 
-                        Log.d("Update Skalar Value","UPdating saklar value "+saklar.getId()+" From: "+oldValue+" to "+newValue);
+                        //Log.d("Update Skalar Value","UPdating saklar value "+saklar.getId()+" From: "+oldValue+" to "+newValue);
                     }catch (Exception e){
                         Toast.makeText(context,"Get data "+saklar.getId()+" fail!",Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
@@ -219,7 +220,7 @@ public class AgnosthingsApi {
                             history.put("value",value);
                             history.put("date",date);
                             historyList.add(history);
-                            Log.d("API",history.toString());
+                            //Log.d("API",history.toString());
                         }
 
                         if(saklarHistoryLoadedListener != null){
@@ -258,7 +259,7 @@ public class AgnosthingsApi {
                             history.put("value",value);
                             history.put("date",date);
                             dataSuhu.add(history);
-                            Log.d("getDataSuhu()",history.toString());
+                            //Log.d("getDataSuhu()",history.toString());
                         }
 
                         if(suhuLoadedListener != null){
@@ -310,7 +311,7 @@ public class AgnosthingsApi {
                             history.put("value",value);
                             history.put("date",date);
                             dataPDAM.add(history);
-                            Log.d("getdataPDAM()",history.toString());
+                            //Log.d("getdataPDAM()",history.toString());
                         }
 
                         if(pdamLoadedListener != null){
@@ -341,6 +342,48 @@ public class AgnosthingsApi {
         });
     }
 
+    public void getDataListrik(){
+        String api_url = "http://agnosthings.com/f9de5cb8-15d3-11e6-8001-005056805279/channel/last/feed/276/1";
+        httpClient.get(context,api_url,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //super.onSuccess(statusCode, headers, response);
+                if(statusCode == 200){
+                    try {
+                        String data = response
+                                .getJSONArray("cValue")
+                                .getString(0);
+
+                        if(listrikLoadedListener != null){
+                            listrikLoadedListener.onDataLoaded(data);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        if(listrikLoadedListener != null){
+                            listrikLoadedListener.onFail();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                //super.onFailure(statusCode, headers, throwable, errorResponse);
+                if(listrikLoadedListener != null){
+                    listrikLoadedListener.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                //super.onFailure(statusCode, headers, responseString, throwable);
+                if(listrikLoadedListener != null){
+                    listrikLoadedListener.onFail();
+                }
+            }
+        });
+    }
+
     // Listener for Saklar update value
     public interface SaklarValueUpdateListener{
         void onValueLoaded();
@@ -363,6 +406,12 @@ public class AgnosthingsApi {
         void onFail();
     }
 
+    // Listener Listrik
+    public interface ListrikLoadedListener{
+        void onDataLoaded(String data);
+        void onFail();
+    }
+
     public void setSaklarHistoryLoadedListener(SaklarHistoryLoadedListener listener){
         this.saklarHistoryLoadedListener = listener;
     }
@@ -381,7 +430,10 @@ public class AgnosthingsApi {
         this.pdamLoadedListener = listener;
     }
 
-
+    // Listener listrik setter
+    public void setListrikLoadedListener(ListrikLoadedListener listener){
+        this.listrikLoadedListener = listener;
+    }
 
 
 
