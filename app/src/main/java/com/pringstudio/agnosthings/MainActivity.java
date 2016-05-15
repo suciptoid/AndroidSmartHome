@@ -156,7 +156,13 @@ public class MainActivity extends AppCompatActivity {
         navRecyclerView.setHasFixedSize(true);
 
         // Navigation Recycler Adapter
-        navAdapter = new NavAdapter(menuTitles,menuIcons,"Judul","Sub Judul",this);
+        navAdapter = new NavAdapter(
+                menuTitles,
+                menuIcons,
+                "",
+                "",
+                this
+        );
 
         // Apply the adapter to recyclerview
         navRecyclerView.setAdapter(navAdapter);

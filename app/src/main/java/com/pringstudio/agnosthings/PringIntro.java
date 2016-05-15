@@ -17,37 +17,51 @@ public class PringIntro extends AppIntro2 {
 
 
         addSlide(AppIntroFragment.newInstance(
-                "Judul",
-                "Deskripsi",
-                R.drawable.ic_cached_grey_200_36dp,
+                "Teknologi Cloud",
+                "Akses dan monitor rumah anda dimana saja, kapan saja dengan teknologi cloud",
+                R.drawable.splash_access,
                 Color.parseColor("#8bc34a"))
         );
 
         addSlide(AppIntroFragment.newInstance(
-                "Judul2",
-                "Deskripsi2",
-                R.drawable.ic_cached_grey_200_36dp,
+                "Monitor Suhu",
+                "Monitoring data suhu ruangan rumah anda",
+                R.drawable.splash_suhu,
+                Color.parseColor("#7e57c2"))
+        );
+
+        addSlide(AppIntroFragment.newInstance(
+                "Monitoring PDAM",
+                "Memonitor pemakaian Air PDAM anda",
+                R.drawable.splash_air,
                 Color.parseColor("#ff9800"))
         );
 
         addSlide(AppIntroFragment.newInstance(
-                "Judul2",
-                "Deskripsi2",
-                R.drawable.ic_cached_grey_200_36dp,
+                "Saklar Jarak jauh",
+                "Kini anda tidak takut lupa mematikan lampu, karena dapat anda kontrol dari SmartPhone anda",
+                R.drawable.splash_lampu,
                 Color.parseColor("#ff5722"))
         );
 
         addSlide(AppIntroFragment.newInstance(
-                "Judul2",
-                "Deskripsi2",
-                R.drawable.ic_cached_grey_200_36dp,
+                "Monitor Konsumsi Listrik",
+                "Memonitor pemakaian pulsa listrik anda",
+                R.drawable.splash_listrik,
                 Color.parseColor("#03a9f4"))
         );
 
         addSlide(AppIntroFragment.newInstance(
-                "Judul2",
-                "Deskripsi2",
-                R.drawable.ic_cached_grey_200_36dp,
+                "Tak perlu khawatir lagi pakai LPG",
+                "Memonitor pemakaian dan kebocoran gas yang ada di dapur anda",
+                R.drawable.splash_lpg,
+                Color.parseColor("#7e57c2"))
+        );
+
+        addSlide(AppIntroFragment.newInstance(
+                "Notifikasi Pintar",
+                "Pemberitahuan yang membuat anda selalu waspada",
+                R.drawable.splash_notif,
                 Color.parseColor("#7e57c2"))
         );
 

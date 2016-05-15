@@ -384,6 +384,48 @@ public class AgnosthingsApi {
         });
     }
 
+    public void getDataLPG(){
+        String api_url = "http://agnosthings.com/f9de5cb8-15d3-11e6-8001-005056805279/channel/last/feed/276/1";
+        httpClient.get(context,api_url,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                //super.onSuccess(statusCode, headers, response);
+                if(statusCode == 200){
+                    try {
+                        String data = response
+                                .getJSONArray("cValue")
+                                .getString(0);
+
+                        if(listrikLoadedListener != null){
+                            listrikLoadedListener.onDataLoaded(data);
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        if(listrikLoadedListener != null){
+                            listrikLoadedListener.onFail();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                //super.onFailure(statusCode, headers, throwable, errorResponse);
+                if(listrikLoadedListener != null){
+                    listrikLoadedListener.onFail();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                //super.onFailure(statusCode, headers, responseString, throwable);
+                if(listrikLoadedListener != null){
+                    listrikLoadedListener.onFail();
+                }
+            }
+        });
+    }
+
     // Listener for Saklar update value
     public interface SaklarValueUpdateListener{
         void onValueLoaded();
