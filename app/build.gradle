@@ -9,13 +9,23 @@ android {
         applicationId "com.pringstudio.agnosthings"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.1-beta"
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    splits {
+        // Split apks on build target ABI, view all options for the splits here:
+        // http://tools.android.com/tech-docs/new-build-system/user-guide/apk-splits
+        abi {
+            enable false
+            reset()
+            include 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'x86', 'x86_64'
         }
     }
 }

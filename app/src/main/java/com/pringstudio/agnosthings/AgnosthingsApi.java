@@ -45,6 +45,7 @@ public class AgnosthingsApi {
     private SuhuLoadedListener suhuLoadedListener;
     private PDAMLoadedListener pdamLoadedListener;
     private ListrikLoadedListener listrikLoadedListener;
+    private LPGLoadedListener lpgLoadedListener;
 
     // Saklar value proccessed data
     int processedData = 0;
@@ -385,7 +386,7 @@ public class AgnosthingsApi {
     }
 
     public void getDataLPG(){
-        String api_url = "http://agnosthings.com/f9de5cb8-15d3-11e6-8001-005056805279/channel/last/feed/276/1";
+        String api_url = "http://agnosthings.com/82f8f396-15d4-11e6-8001-005056805279/channel/last/feed/277/1";
         httpClient.get(context,api_url,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -396,13 +397,13 @@ public class AgnosthingsApi {
                                 .getJSONArray("cValue")
                                 .getString(0);
 
-                        if(listrikLoadedListener != null){
-                            listrikLoadedListener.onDataLoaded(data);
+                        if(lpgLoadedListener != null){
+                            lpgLoadedListener.onDataLoaded(data);
                         }
                     }catch (Exception e){
                         e.printStackTrace();
-                        if(listrikLoadedListener != null){
-                            listrikLoadedListener.onFail();
+                        if(lpgLoadedListener != null){
+                            lpgLoadedListener.onFail();
                         }
                     }
                 }
@@ -411,16 +412,16 @@ public class AgnosthingsApi {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
-                if(listrikLoadedListener != null){
-                    listrikLoadedListener.onFail();
+                if(lpgLoadedListener != null){
+                    lpgLoadedListener.onFail();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 //super.onFailure(statusCode, headers, responseString, throwable);
-                if(listrikLoadedListener != null){
-                    listrikLoadedListener.onFail();
+                if(lpgLoadedListener != null){
+                    lpgLoadedListener.onFail();
                 }
             }
         });
@@ -454,6 +455,12 @@ public class AgnosthingsApi {
         void onFail();
     }
 
+    // Listener LPG
+    public interface LPGLoadedListener{
+        void onDataLoaded(String data);
+        void onFail();
+    }
+
     public void setSaklarHistoryLoadedListener(SaklarHistoryLoadedListener listener){
         this.saklarHistoryLoadedListener = listener;
     }
@@ -475,6 +482,11 @@ public class AgnosthingsApi {
     // Listener listrik setter
     public void setListrikLoadedListener(ListrikLoadedListener listener){
         this.listrikLoadedListener = listener;
+    }
+
+    // Listener listrik setter
+    public void setLPGLoadedListener(LPGLoadedListener listener){
+        this.lpgLoadedListener = listener;
     }
 
 

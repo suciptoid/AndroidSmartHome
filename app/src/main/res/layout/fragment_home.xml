@@ -93,7 +93,7 @@
                                 android:background="@drawable/circle_shape"
                                 android:indeterminate="false"
                                 android:max="100"
-                                android:progress="0"
+                                android:progress="100"
                                 android:progressDrawable="@drawable/circular_progress_bar" />
 
                             <TextView
@@ -110,7 +110,7 @@
                                 android:textStyle="bold" />
                             <TextView
                                 android:id="@+id/update_listrik_text"
-                                android:text="Update :\n -"
+                                android:text="Loading..."
                                 android:paddingTop="70dp"
                                 android:textSize="10dp"
                                 android:gravity="center"
@@ -152,7 +152,7 @@
                                 android:background="@drawable/circle_shape"
                                 android:indeterminate="false"
                                 android:max="100"
-                                android:progress="75"
+                                android:progress="100"
                                 android:progressDrawable="@drawable/circular_progress_bar" />
 
                             <TextView
@@ -163,13 +163,13 @@
                                 android:layout_centerInParent="true"
                                 android:background="@android:color/transparent"
                                 android:gravity="center"
-                                android:text="75%"
+                                android:text="0%"
                                 android:textColor="@color/colorPrimary"
                                 android:textSize="30sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:id="@+id/update_lpg_text"
-                                android:text="Update :\n 8 Mei 2016 23:00"
+                                android:text="Loading..."
                                 android:paddingTop="70dp"
                                 android:textSize="10dp"
                                 android:gravity="center"

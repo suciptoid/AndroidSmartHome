@@ -57,8 +57,6 @@ public class SaklarAdapter extends RecyclerView.Adapter<SaklarAdapter.SaklarHold
                 }
             });
         }
-
-
     }
 
     public SaklarAdapter(List<Saklar> saklarList) {

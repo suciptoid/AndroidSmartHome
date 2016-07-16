@@ -2,11 +2,15 @@ package com.pringstudio.agnosthings;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,23 +20,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.pringstudio.agnosthings.view.ProgressBarAnimation;
 
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +51,11 @@ public class FragmentHome extends Fragment {
 
     AgnosthingsApi api;
 
+    LinearLayout pulsaListrikLayout;
+
+    // Shared Prefrence
+    SharedPreferences sharedPreferences;
+
     // Empty Constructor
     public FragmentHome(){
         setHasOptionsMenu(true);
@@ -60,6 +64,16 @@ public class FragmentHome extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Shared prefrence
+        sharedPreferences = getContext().getSharedPreferences("LISTRIK",Context.MODE_PRIVATE);
+
+        // Default KWH
+        if(sharedPreferences.getInt("KWH",0) == 0){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt("KWH",200);
+            editor.commit();
+        }
+
     }
 
     @Nullable
@@ -67,6 +81,7 @@ public class FragmentHome extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater,container,savedInstanceState);
         mainView = inflater.inflate(R.layout.fragment_home, container, false);
+
 
         // Setup api
         api = new AgnosthingsApi(getContext());
@@ -103,11 +118,53 @@ public class FragmentHome extends Fragment {
     }
 
     private void setupListener(){
-        LinearLayout linearPulsa = (LinearLayout) mainView.findViewById(R.id.pulsaListrik);
-        linearPulsa.setOnClickListener(new View.OnClickListener() {
+        pulsaListrikLayout = (LinearLayout) mainView.findViewById(R.id.pulsaListrik);
+        pulsaListrikLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Pulsa","Clicked");
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Masukan KWH Token");
+
+                // Linear layout container view
+                LinearLayout layoutDialog = new LinearLayout(getContext());
+                layoutDialog.setOrientation(LinearLayout.VERTICAL);
+                layoutDialog.setPadding(10,10,10,10);
+
+                // Textview untuk deskripsi
+                TextView textDialog = new TextView(getContext());
+                textDialog.setText("Masukkan nilai KWH yang anda dapatkan saat membeli token listrik");
+                textDialog.setPadding(6,6,6,6);
+                layoutDialog.addView(textDialog);
+
+                // EditText untuk input
+                final EditText input = new EditText(getContext());
+                input.setText(String.valueOf(sharedPreferences.getInt("KWH",0)));
+                input.setInputType(InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_CLASS_NUMBER);
+
+                layoutDialog.addView(input);
+
+                builder.setView(layoutDialog);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int kwhValue = Integer.valueOf(input.getText().toString());
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("KWH",kwhValue);
+                        editor.commit();
+
+                    }
+                });
+
+                builder.setNegativeButton("Batal", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
         });
     }
@@ -250,7 +307,9 @@ public class FragmentHome extends Fragment {
         final ProgressBar progressBarLPG = (ProgressBar) mainView.findViewById(R.id.progressLpg);
         final TextView listrikUpdated = (TextView) mainView.findViewById(R.id.update_listrik_text);
         final TextView listrikProgress = (TextView) mainView.findViewById(R.id.progress_listrik_text);
-        final int maxValue = 200;
+        final TextView lpgUpdated = (TextView) mainView.findViewById(R.id.update_lpg_text);
+        final TextView lpgProgress = (TextView) mainView.findViewById(R.id.progress_lpg_text);
+        final int maxValue = sharedPreferences.getInt("KWH",100);
 
 
         // Reset Progressbar
@@ -261,8 +320,15 @@ public class FragmentHome extends Fragment {
 
         startCountAnimation(listrikProgress,500,(progressBarListrik.getProgress()*100)/maxValue,0);
 
+        ProgressBarAnimation animation2 = new ProgressBarAnimation(progressBarLPG,progressBarLPG.getProgress(),0);
+        animation2.setDuration(500);
+        progressBarLPG.setAnimation(animation2);
+
         listrikUpdated.setText("Loading...");
         listrikProgress.setText("0%");
+
+        lpgUpdated.setText("Loading...");
+        lpgProgress.setText("0%");
 
         api.getDataListrik();
         api.setListrikLoadedListener(new AgnosthingsApi.ListrikLoadedListener() {
@@ -295,8 +361,8 @@ public class FragmentHome extends Fragment {
                 listrikProgress.setText(prosentase+"%");
                 startCountAnimation(listrikProgress,1000,0,Integer.valueOf(prosentase));
 
-                // Test progressbar
 
+                //Update Progressbar
                 progressBarListrik.setMax(maxValue);
                 progressBarListrik.setProgress(Integer.valueOf(kwh));
                 ProgressBarAnimation animation = new ProgressBarAnimation(progressBarListrik,0,Integer.valueOf(kwh));
@@ -318,12 +384,55 @@ public class FragmentHome extends Fragment {
             }
         });
 
+        api.getDataLPG();
+        api.setLPGLoadedListener(new AgnosthingsApi.LPGLoadedListener() {
+            @Override
+            public void onDataLoaded(String data) {
+                String prosentase = data.split(",")[1];
+                String lastDate = data.split(",")[2];
 
-        // Test progressbar
-        //TODO: Progressbar GAS LPG
-        ProgressBarAnimation animation2 = new ProgressBarAnimation(progressBarLPG,0,progressBarLPG.getProgress());
-        animation2.setDuration(1500);
-        progressBarLPG.setAnimation(animation2);
+                // Date formater
+                SimpleDateFormat sourceFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+                Date parsed = new Date();
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm");
+                dateFormat.setTimeZone(TimeZone.getDefault());
+
+                // end date formater
+
+                try {
+                    parsed = sourceFormat.parse(lastDate);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                String newDate = dateFormat.format(parsed);
+
+                // Update text
+                lpgUpdated.setText("Update : \n"+newDate);
+                lpgProgress.setText(prosentase+"%");
+                startCountAnimation(lpgProgress,1000,0,Integer.valueOf(prosentase));
+
+                //Update Progressbar
+                //progressBarLPG.setMax(maxValue);
+                progressBarLPG.setProgress(Integer.valueOf(prosentase));
+                ProgressBarAnimation animation = new ProgressBarAnimation(progressBarLPG,0,Integer.valueOf(prosentase));
+                animation.setDuration(1000);
+                progressBarLPG.setAnimation(animation);
+            }
+
+            @Override
+            public void onFail() {
+                try{
+                    Snackbar.make(getView(),"Refresh data gagal, coba lagi nanti", Snackbar.LENGTH_LONG).show();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
     }
 
     private void startCountAnimation(TextView textProgress, int duration, int from, int to) {

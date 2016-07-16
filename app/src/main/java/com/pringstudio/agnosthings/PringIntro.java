@@ -53,11 +53,11 @@ public class PringIntro extends AppIntro2 {
 
         addSlide(AppIntroFragment.newInstance(
                 "Tak perlu khawatir lagi pakai LPG",
-                "Memonitor pemakaian dan kebocoran gas yang ada di dapur anda",
+                "Memonitor pemakaian gas LPG yang ada di dapur anda",
                 R.drawable.splash_lpg,
                 Color.parseColor("#7e57c2"))
         );
-
+/*
         addSlide(AppIntroFragment.newInstance(
                 "Notifikasi Pintar",
                 "Pemberitahuan yang membuat anda selalu waspada",
@@ -65,7 +65,7 @@ public class PringIntro extends AppIntro2 {
                 Color.parseColor("#7e57c2"))
         );
 
-
+*/
         setProgressButtonEnabled(true);
 
 

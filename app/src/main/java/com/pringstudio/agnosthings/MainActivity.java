@@ -244,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
         // Apply Fragment to Main Frame
         if(fragment != null){
             transaction.replace(R.id.frame_main, fragment);
+            transaction.addToBackStack(null);
             transaction.commit();
         }
 
