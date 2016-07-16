@@ -1,6 +1,8 @@
 # AndroidSmartHome
 Android Smart Home App using Agnosthing.com IoT Platform
 
+## Screenshot
+![Screenshot](/device-2016-05-16-183543.png?raw=true "Screenshot")
 
 ## License
 ```
