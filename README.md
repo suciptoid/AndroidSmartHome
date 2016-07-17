@@ -1,5 +1,10 @@
 # AndroidSmartHome
-Android Smart Home App using Agnosthing.com IoT Platform
+Android Smart Home App using Agnosthing.com IoT Platform.
+
+Dicoding Challenge [AgnosThings Savvy Home Apps Challenges](https://www.dicoding.com/challenges/71)
+
+## API
+You can register your Agnosthings api UID here [Agnosthings.com](http://agnosthings.com/)
 
 ## Screenshot
 ![Screenshot](/device-2016-05-16-183636.png?raw=true "Screenshot")
